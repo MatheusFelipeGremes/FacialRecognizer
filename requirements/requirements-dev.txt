@@ -1,0 +1,4 @@
+covdefaults>=2.2
+coverage
+pre-commit
+pytest
