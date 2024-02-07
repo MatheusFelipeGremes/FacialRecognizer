@@ -118,33 +118,78 @@ class LabeledFacesWildDataset(Dataset):
         Returns
         -------
             Tuple: A tuple containing images.
+
+        This method retrieves a sample from the dataset at the given index.
+        It returns a tuple containing four images:
+        - The first two images represent a match.
+        - The last two images represent a mismatch.
+        """
+        match_images = self._get_match_images(idx)
+        mismatch_images = self._get_mismatch_images(idx)
+        return match_images[0], match_images[1], mismatch_images[0], mismatch_images[0]
+
+    def _get_match_images(self, idx: int) -> tuple[Tensor, Tensor]:
+        """
+        Retrieve a pair of images representing a match at the given index.
+
+        Args:
+            idx (int): Index of the match pair to retrieve.
+
+        Returns
+        -------
+            tuple: A tuple containing two images representing a match.
+
+        This method retrieves a pair of images representing a match from the dataset at the given index.
+        It returns a tuple containing two images. The first image corresponds to the first image in the match pair,
+        and the second image corresponds to the second image in the match pair.
         """
         match_1_name = self.df_match.iloc[idx, 0]
         match_1_img_number = self.df_match.iloc[idx, 1]
         match_2_img_number = self.df_match.iloc[idx, 2]
 
+        match_1_img_path = Path(self.img_dir) / match_1_name / f'{match_1_name}_{match_1_img_number:04d}.jpg'
+        match_2_img_path = Path(self.img_dir) / match_1_name / f'{match_1_name}_{match_2_img_number:04d}.jpg'
+
+        image_1 = read_image(str(match_1_img_path))
+        image_2 = read_image(str(match_2_img_path))
+
+        if self.transform:
+            image_1 = self.transform(image_1)
+            image_2 = self.transform(image_2)
+
+        return image_1, image_2
+
+    def _get_mismatch_images(self, idx: int) -> tuple[Tensor, Tensor]:
+        """
+        Retrieve a pair of images representing a mismatch at the given index.
+
+        Args:
+            idx (int): Index of the mismatch pair to retrieve.
+
+        Returns
+        -------
+            tuple: A tuple containing two images representing a mismatch.
+
+        This method retrieves a pair of images representing a mismatch from the dataset at the given index.
+        It returns a tuple containing two images. The first image corresponds to one image in the mismatch pair,
+        and the second image corresponds to the other image in the mismatch pair.
+        """
         mismatch_1_name = self.df_miss_match.iloc[idx, 0]
         mismatch_2_name = self.df_miss_match.iloc[idx, 2]
         mismatch_1_img_number = self.df_miss_match.iloc[idx, 1]
         mismatch_2_img_number = self.df_miss_match.iloc[idx, 3]
 
-        match_1_img_path = Path(self.img_dir) / match_1_name / f'{match_1_name}_{match_1_img_number:04d}.jpg'
-        match_2_img_path = Path(self.img_dir) / match_1_name / f'{match_1_name}_{match_2_img_number:04d}.jpg'
         mismatch_1_img_path = Path(self.img_dir) / mismatch_1_name / f'{mismatch_1_name}_{mismatch_1_img_number:04d}.jpg'
         mismatch_2_img_path = Path(self.img_dir) / mismatch_2_name / f'{mismatch_2_name}_{mismatch_2_img_number:04d}.jpg'
 
-        image_1 = read_image(str(match_1_img_path))
-        image_2 = read_image(str(match_2_img_path))
-        image_3 = read_image(str(mismatch_1_img_path))
-        image_4 = read_image(str(mismatch_2_img_path))
+        image_1 = read_image(str(mismatch_1_img_path))
+        image_2 = read_image(str(mismatch_2_img_path))
 
         if self.transform:
             image_1 = self.transform(image_1)
             image_2 = self.transform(image_2)
-            image_3 = self.transform(image_3)
-            image_4 = self.transform(image_4)
 
-        return image_1, image_2, image_3, image_4
+        return image_1, image_2
 
 
 def main() -> int:
