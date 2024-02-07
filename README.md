@@ -40,4 +40,4 @@ This project is distributed under the MIT license. See the `LICENSE` file for mo
 The dataset utilized in this project is the LFW - People (Face Recognition) dataset available at:
 https://www.kaggle.com/datasets/atulanandjha/lfwpeople
 
-Feel free to explore and utilize this dataset for your experiments!
+Readme of the dataset: https://vis-www.cs.umass.edu/lfw/README.txt
