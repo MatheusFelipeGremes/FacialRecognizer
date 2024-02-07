@@ -10,6 +10,7 @@ from torchvision.io import read_image
 class LabeledFacesWildDataset(Dataset):
     """
     Dataset class for Labeled Faces in the Wild (LFW) dataset.
+    Readme of the dataset: https://vis-www.cs.umass.edu/lfw/README.txt
 
     This dataset contains pairs of images along with labels indicating whether the images are of the same person
     (match) or different persons (mismatch). The dataset is divided into matched pairs and mismatched pairs.
@@ -81,26 +82,26 @@ class LabeledFacesWildDataset(Dataset):
         -------
             Tuple: A tuple containing images.
         """
-        name_match_1 = self.df_match.iloc[idx, 0]
-        name_m_number_1 = self.df_match.iloc[idx, 1]
-        name_m_number_2 = self.df_match.iloc[idx, 2]
+        match_1_name = self.df_match.iloc[idx, 0]
+        match_1_img_number = self.df_match.iloc[idx, 1]
+        match_2_img_number = self.df_match.iloc[idx, 2]
 
-        img_path_match_1 = os.path.join(self.img_dir, name_match_1, f'{name_match_1}_{name_m_number_1:04d}.jpg')
-        img_path_match_2 = os.path.join(self.img_dir, name_match_1, f'{name_match_1}_{name_m_number_2:04d}.jpg')
+        match_1_img_path = os.path.join(self.img_dir, match_1_name, f'{match_1_name}_{match_1_img_number:04d}.jpg')
+        match_2_img_path = os.path.join(self.img_dir, match_1_name, f'{match_1_name}_{match_2_img_number:04d}.jpg')
 
-        image_1 = read_image(img_path_match_1)
-        image_2 = read_image(img_path_match_2)
+        image_1 = read_image(match_1_img_path)
+        image_2 = read_image(match_2_img_path)
 
-        name_miss_match_1 = self.df_miss_match.iloc[idx, 0]
-        name_miss_match_2 = self.df_miss_match.iloc[idx, 2]
-        name_mm_number_1 = self.df_miss_match.iloc[idx, 1]
-        name_mm_number_2 = self.df_miss_match.iloc[idx, 3]
+        mismatch_1_name = self.df_miss_match.iloc[idx, 0]
+        mismatch_2_name = self.df_miss_match.iloc[idx, 2]
+        mismatch_1_img_number = self.df_miss_match.iloc[idx, 1]
+        mismatch_2_img_number = self.df_miss_match.iloc[idx, 3]
 
-        img_path_match_3 = os.path.join(self.img_dir, name_miss_match_1, f'{name_miss_match_1}_{name_mm_number_1:04d}.jpg')
-        img_path_match_4 = os.path.join(self.img_dir, name_miss_match_2, f'{name_miss_match_2}_{name_mm_number_2:04d}.jpg')
+        mismatch_1_img_path = os.path.join(self.img_dir, mismatch_1_name, f'{mismatch_1_name}_{mismatch_1_img_number:04d}.jpg')
+        mismatch_2_img_path = os.path.join(self.img_dir, mismatch_2_name, f'{mismatch_2_name}_{mismatch_2_img_number:04d}.jpg')
 
-        image_3 = read_image(img_path_match_3)
-        image_4 = read_image(img_path_match_4)
+        image_3 = read_image(mismatch_1_img_path)
+        image_4 = read_image(mismatch_2_img_path)
 
         if self.transform:
             image_1 = self.transform(image_1)
