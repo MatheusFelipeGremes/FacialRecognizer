@@ -1,15 +1,52 @@
+"""
+Module containing a dataset class for Labeled Faces in the Wild (LFW) dataset.
+
+Labeled Faces in the Wild (LFW) dataset is a collection of pairs of images with labels indicating
+whether the images depict the same person (match) or different persons (mismatch). This dataset
+is commonly used for face recognition tasks.
+
+More information about the dataset can be found in the readme file available at:
+https://vis-www.cs.umass.edu/lfw/README.txt
+
+This module provides a dataset class, `LabeledFacesWildDataset`, for loading and working with the LFW dataset.
+
+Classes:
+    LabeledFacesWildDataset: A dataset class for loading LFW dataset.
+
+Usage:
+    To use this module, import the `LabeledFacesWildDataset` class and create an instance by providing
+    the path to the directory containing the images and the path to the annotations file.
+    For example:
+
+    ```
+    from facial_recognizer.dataset import LabeledFacesWildDataset
+
+    annotations_file = 'dataset/pairsDevTrain.txt'
+    img_dir = 'dataset/lfw_funneled'
+
+    dataset = LabeledFacesWildDataset(img_dir, annotations_file)
+    ```
+
+    Once the dataset is instantiated, it can be used like any other PyTorch Dataset object.
+"""
+
 from __future__ import annotations
 
-import os
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pandas as pd
 from torch.utils.data import Dataset
 from torchvision.io import read_image
 
+if TYPE_CHECKING:
+    from torch import Tensor
+
 
 class LabeledFacesWildDataset(Dataset):
     """
     Dataset class for Labeled Faces in the Wild (LFW) dataset.
+
     Readme of the dataset: https://vis-www.cs.umass.edu/lfw/README.txt
 
     This dataset contains pairs of images along with labels indicating whether the images are of the same person
@@ -44,7 +81,7 @@ class LabeledFacesWildDataset(Dataset):
 
     def __init__(self, img_dir: str, annotations_file: str, transform: None = None):
         """
-        Initializes the LabeledFacesWildDataset object.
+        Initialize the LabeledFacesWildDataset object.
 
         Args:
             img_dir (str): Path to the directory containing the images.
@@ -52,7 +89,7 @@ class LabeledFacesWildDataset(Dataset):
             transform (callable, optional): A function/transform that takes in an PIL image and returns a transformed version.
                                              Default is None.
         """
-        with open(annotations_file) as file:
+        with Path(annotations_file).open() as file:
             num_lines = int(next(file))
 
         self.df_match = pd.read_csv(annotations_file, sep='\t', skiprows=1, nrows=num_lines, header=None)
@@ -61,9 +98,9 @@ class LabeledFacesWildDataset(Dataset):
         self.img_dir = img_dir
         self.transform = transform
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
-        Returns the total number of samples in the dataset.
+        Return the total number of samples in the dataset.
 
         Returns
         -------
@@ -71,9 +108,9 @@ class LabeledFacesWildDataset(Dataset):
         """
         return len(self.df_match) + len(self.df_miss_match)
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, idx: int) -> tuple[Tensor, Tensor, Tensor, Tensor]:
         """
-        Retrieves the sample at the given index.
+        Retrieve the sample at the given index.
 
         Args:
             idx (int): Index of the sample to retrieve.
@@ -86,22 +123,20 @@ class LabeledFacesWildDataset(Dataset):
         match_1_img_number = self.df_match.iloc[idx, 1]
         match_2_img_number = self.df_match.iloc[idx, 2]
 
-        match_1_img_path = os.path.join(self.img_dir, match_1_name, f'{match_1_name}_{match_1_img_number:04d}.jpg')
-        match_2_img_path = os.path.join(self.img_dir, match_1_name, f'{match_1_name}_{match_2_img_number:04d}.jpg')
-
-        image_1 = read_image(match_1_img_path)
-        image_2 = read_image(match_2_img_path)
-
         mismatch_1_name = self.df_miss_match.iloc[idx, 0]
         mismatch_2_name = self.df_miss_match.iloc[idx, 2]
         mismatch_1_img_number = self.df_miss_match.iloc[idx, 1]
         mismatch_2_img_number = self.df_miss_match.iloc[idx, 3]
 
-        mismatch_1_img_path = os.path.join(self.img_dir, mismatch_1_name, f'{mismatch_1_name}_{mismatch_1_img_number:04d}.jpg')
-        mismatch_2_img_path = os.path.join(self.img_dir, mismatch_2_name, f'{mismatch_2_name}_{mismatch_2_img_number:04d}.jpg')
+        match_1_img_path = Path(self.img_dir) / match_1_name / f'{match_1_name}_{match_1_img_number:04d}.jpg'
+        match_2_img_path = Path(self.img_dir) / match_1_name / f'{match_1_name}_{match_2_img_number:04d}.jpg'
+        mismatch_1_img_path = Path(self.img_dir) / mismatch_1_name / f'{mismatch_1_name}_{mismatch_1_img_number:04d}.jpg'
+        mismatch_2_img_path = Path(self.img_dir) / mismatch_2_name / f'{mismatch_2_name}_{mismatch_2_img_number:04d}.jpg'
 
-        image_3 = read_image(mismatch_1_img_path)
-        image_4 = read_image(mismatch_2_img_path)
+        image_1 = read_image(str(match_1_img_path))
+        image_2 = read_image(str(match_2_img_path))
+        image_3 = read_image(str(mismatch_1_img_path))
+        image_4 = read_image(str(mismatch_2_img_path))
 
         if self.transform:
             image_1 = self.transform(image_1)
@@ -112,12 +147,19 @@ class LabeledFacesWildDataset(Dataset):
         return image_1, image_2, image_3, image_4
 
 
-def main():
+def main() -> int:
+    """
+    Test function for LabeledFacesWildDataset.
+
+    Note
+    ----
+    This function is intended for testing purposes only.
+    """
     annotations_file = r'dataset\pairsDevTrain.txt'
     img_dir = r'dataset\lfw_funneled'
 
     dataset = LabeledFacesWildDataset(img_dir, annotations_file)
 
-    breakpoint()
-
     image_1, image_2, image_3, image_4 = dataset[0]
+
+    return 0

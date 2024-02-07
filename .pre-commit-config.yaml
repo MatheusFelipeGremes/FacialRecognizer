@@ -31,7 +31,7 @@ repos:
     rev: v1.8.0
     hooks:
       - id: mypy
-        args: [--strict, --ignore-missing-imports]
+        args: [--strict, --ignore-missing-imports, --allow-subclassing-any]
         additional_dependencies: [tokenize-rt==3.2.0]
 
   - repo: https://github.com/asottile/add-trailing-comma
