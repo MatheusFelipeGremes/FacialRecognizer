@@ -1,1 +1,4 @@
 loguru
+pandas
+torch
+torchvision
