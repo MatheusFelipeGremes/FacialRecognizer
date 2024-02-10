@@ -165,8 +165,8 @@ def main() -> int:
     ----
     This function is intended for testing purposes only.
     """
-    img_dir = r'dataset\lfw_funneled'
-    pairs_txt = r'dataset\lfw_funneled\pairs_01.txt'
+    img_dir = r'archive/lfw-funneled/lfw_funneled'
+    pairs_txt = r'archive/lfw-funneled/lfw_funneled/pairs_01.txt'
 
     dataset = LabeledFacesWildDataset(img_dir, pairs_txt)
 
