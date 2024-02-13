@@ -165,11 +165,30 @@ def main() -> int:
     ----
     This function is intended for testing purposes only.
     """
+    import torchvision.transforms.functional as TF
+    from PIL import Image
+    import torch
+
     img_dir = r'archive/lfw-funneled/lfw_funneled'
     pairs_txt = r'archive/lfw-funneled/lfw_funneled/pairs_01.txt'
 
     dataset = LabeledFacesWildDataset(img_dir, pairs_txt)
 
     image_1, image_2, image_3, image_4 = dataset[0]
+
+    # Convertendo o tensor para uma imagem PIL
+    image_pil_1 = TF.to_pil_image(image_1)
+    image_pil_2 = TF.to_pil_image(image_2)
+    image_pil_3 = TF.to_pil_image(image_3)
+    image_pil_4 = TF.to_pil_image(image_4)
+
+    # Visualizando a imagem
+    image_pil_1.save("visualizar_image_1.png")
+    image_pil_2.save("visualizar_image_2.png")
+    image_pil_3.save("visualizar_image_3.png")
+    image_pil_4.save("visualizar_image_4.png")
+
+
+    breakpoint()
 
     return 0
